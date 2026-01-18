@@ -152,6 +152,8 @@ class Main:
         elif operations[choice] is mo.my_sqrt:
             if result.value:
                 handle_result(1)
+                if result.value == None:
+                    a.value = io.get_number(float, "Введите значение числа: ")
                 result.value = operations[choice](a.value)
             else:
                 a.value = io.get_number(float, "Введите значение числа: ")
@@ -171,5 +173,4 @@ class Main:
         else:
             a.value = io.get_number(float, "Введите значение переменной a: ")
             b.value = io.get_number(float, "Введите значение переменной b: ")
-
             result.value = operations[choice](a.value, b.value)
