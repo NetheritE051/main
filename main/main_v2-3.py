@@ -1,11 +1,12 @@
 print("Добро пожаловать в чалькулятор(v2.3!!!!!)")
-from math import sqrt
+from cmath import sqrt
+import sys
 
 class InputOutput:
     """Класс создаёт объекты с принимаемым значением на входе"""
     def __init__(self, value=None):
         self.value = value
-
+    
     @staticmethod
     def get_number(num_type, prompt, error=None):
         while True:
@@ -17,15 +18,43 @@ class InputOutput:
                 else:
                     print("ОшибкО: Введено недействительное значение переменной!")
     
+    @staticmethod
+    def handle_result(res, num1, num2=None):
+        if res is not None:
+            while True:
+                c = input("Использовать результат последней выполненной операции?\n1. Да\n2. Нет\nВыбор: ")
+                if c.strip().lower() in ("1", "yes", "да"):
+                    if num2 is None:
+                        num1.value = res
+                        return None
+                    while True:
+                        r = input("Какой переменной присвоить значение результата?\nДля примера, формула: a + b = c\n1. Переменной 'a'\n2. Переменной 'b'\nВыбор: ")
+                        if r.strip().lower() in ("1", "a", "а"):
+                            num1.value = res
+                            return "a"
+                        elif r.strip().lower() in ("2", "b", "б"):
+                            num2.value = res
+                            return "b"
+                        else:
+                            print("Недействительное значение выбора!")
+                            continue
+                elif c.strip().lower() in ("2", "no", "нет"):
+                    return None
+                else:
+                    print("Нет такого выбора!")
+                    continue
+        else:
+            return None
+    
 class MathOperations:
     """Класс по вычислению математических операций"""
     @staticmethod
     def ee():
         print("Hello, World! Пасхалка")
-
+    
     @staticmethod
-    def exit():
-        return 1 / 0
+    def shutdown():
+        sys.exit("Выход из программы...")
     
     @staticmethod
     def my_add(num1, num2):
@@ -39,8 +68,12 @@ class MathOperations:
     
     @staticmethod
     def my_mul(num1, num2):
-        print(f"Произведение: {num1} * {num2} = {num1 * num2}")
-        return num1 * num2
+        try:
+            print(f"Произведение: {num1} * {num2} = {num1 * num2}")
+            return num1 * num2
+        except OverflowError:
+            print("Результат ОЧЕНЬ большой!")
+            return None
     
     @staticmethod
     def my_div(num1, num2):
@@ -52,125 +85,59 @@ class MathOperations:
     
     @staticmethod
     def my_pow(num1, num2):
-        while True:
-            try:
-                print(f"Результат степени: {num1} ^ {num2} = {num1 ** num2}")
-                return num1 ** num2
-            except(OverflowError):
-                print("Результат ОЧЕНЬ большоооооооооой!!!!!")
-                return None
-
+        try:
+            print(f"Результат степени: {num1} ^ {num2} = {num1 ** num2}")
+            return num1 ** num2
+        except OverflowError:
+            print("Результат СЛИШКОМ большоооооооооой!!!!!")
+            return None
+    
     @staticmethod        
     def my_sqrt(num):
-        if num < 0:
-            print(f"Корень из отрицательного числа...? Ладно, вот корявый результат: {num ** -0.5}")
-            return None
         print(f"Результат корня: {sqrt(num)}")
         return sqrt(num)
 
-#Ярлыки классов для удобства
-io = InputOutput
-mo = MathOperations
-#Объекты со значениями состояния
-a = InputOutput()
-b = InputOutput()
-result = InputOutput()
-#Отдельно вынес словари...потому что я люблю Python-Qython
-c_variants_positive = ["Да", "дА", "ДА", "да", "1", 1]
-c_variants_negative = ["Нет", "нЕт", "неТ", "НеТ", "нЕТ", "НЕт", "НЕТ", "нет", "2", 2]
-
 class Main:
+    #Класс для экспериментов и тестов ядерного кода
+    #Ярлыки классов для удобства
+    IO = InputOutput
+    MO = MathOperations
+
+    a, b, result = IO(0), IO(0), IO(None)
+
     operations = {
-        0: mo.ee,
-        1: mo.my_add,
-        2: mo.my_dif,
-        3: mo.my_mul,
-        4: mo.my_div,
-        5: mo.my_pow,
-        6: mo.my_sqrt,
-        7: mo.exit
+        0: MO.ee,
+        1: MO.my_add,
+        2: MO.my_dif,
+        3: MO.my_mul,
+        4: MO.my_div,
+        5: MO.my_pow,
+        6: MO.my_sqrt,
+        7: MO.shutdown
     }
-    
-    @staticmethod
-    def handle_result(arg=0):
-        if result.value:
-            if arg == 0:
-                print("Использовать использовать значение результата последней выполненной операции? \n1. Да \n2. Нет")
-                while True:
-                    c = io.get_number(str, "Выбор: ", "Недействительное значение!")
-                    if c in c_variants_positive:
-                        print("Какой из переменных(значение выбранной переменной будет перезаписано) присвоить значение последнего результата? Для примера: a + b = c \n1. Переменной 'a' \n2. Переменной 'b'")
-                        while True:
-                            r = io.get_number(str, "> ", "Недействительное значение!")
-                            if r == "a" or r == "1":
-                                a.value = result.value
-                                return
-                            elif r == "b" or r == "2":
-                                b.value = result.value
-                                return
-                            else:
-                                print("Недействительное значение выбора!")
-                                continue
-                    elif c in c_variants_negative:
-                        result.value = None
-                        return None
-                    else:
-                        print("Недействительное значение выбора!")
-                        continue
-            elif arg == 1:
-                print("Использовать использовать значение результата последней выполненной операции? \n1. Да \n2. Нет")
-                while True:
-                    c = io.get_number(str, "Выбор: ", "Недействительное значение!")
-                    if c in c_variants_positive:
-                        a.value = result.value
-                        return
-                    elif c in c_variants_negative:
-                        result.value = None
-                        return
-                    else:
-                        print("Недействительное значение выбора!")
-                        continue
-            else:
-                print("Недействительное значение аргумента!")
-                return None
 
     while True:
+        #Переменные сбрасывают свои значения до нуля после перезапуска калькулятора или после выполнения операций, не затрагивая последний результат, если он есть
         a.value = 0
         b.value = 0
 
-        choice = io.get_number(int, "\nВыберите операцию(по номеру из доступных): \n1. Сложение \n2. Вычитание \n3. Умножение \n4. Деление \n5. Возведение в степень \n6. Корень из числа \n7. Выход из программы \n> ", "Недействительный номер!")
-        if choice not in operations:
-            print("Такой операции нет!")
-            continue
-
-        elif operations[choice] is mo.exit:
-            mo.exit()
-
-        elif operations[choice] is mo.ee:
-            mo.ee()
-
-        elif operations[choice] is mo.my_sqrt:
-            if result.value:
-                handle_result(1)
-                if result.value == None:
-                    a.value = io.get_number(float, "Введите значение числа: ")
-                result.value = operations[choice](a.value)
+        choice = IO.get_number(int, "\nДоступные операции:\n1. Сложение\n2. Вычитание\n3. Умножение\n4. Деление\n5. Возведение в степень\n6. Корень из числа\n7. Выход из программы\n> ", "Ошибка: Введите целое число, соответствующее номеру операции!")
+        if choice in operations:
+            if operations[choice] in (MO.shutdown, MO.ee):
+                operations[choice]()
             else:
-                a.value = io.get_number(float, "Введите значение числа: ")
-                result.value = operations[choice](a.value)
-
-        elif result.value:
-            handle_result()
-            if a.value == result.value and a.value != None:
-                b.value = io.get_number(float, "Введите значение переменной b: ")
-            elif b.value == result.value and a.value != None:
-                a.value = io.get_number(float, "Введите значение переменной a: ")
-            else:
-                a.value = io.get_number(float, "Введите значение переменной a: ")
-                b.value = io.get_number(float, "Введите значение переменной b: ")
-            result.value = operations[choice](a.value, b.value)
-
+                if operations[choice] is MO.my_sqrt:
+                    r = IO.handle_result(result.value, a)
+                    result.value = operations[choice](a.value)
+                    continue
+                r = IO.handle_result(result.value, a, b)
+                if r == "a":
+                    b.value = IO.get_number(float, "Введите значение переменной b: ")
+                elif r == "b":
+                    a.value = IO.get_number(float, "Введите значение переменной a: ")
+                else:
+                    a.value = IO.get_number(float, "Введите значение переменной a: ")
+                    b.value = IO.get_number(float, "Введите значение переменной b: ")
+                result.value = operations[choice](a.value, b.value)
         else:
-            a.value = io.get_number(float, "Введите значение переменной a: ")
-            b.value = io.get_number(float, "Введите значение переменной b: ")
-            result.value = operations[choice](a.value, b.value)
+            print("Нет такой операции!")
